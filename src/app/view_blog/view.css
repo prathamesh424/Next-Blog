@@ -1,0 +1,22 @@
+::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+   ::-webkit-scrollbar-track {
+    background: #222a35;
+  }
+  
+   ::-webkit-scrollbar-thumb {
+    background: #575c66;
+    border-radius: 6px;
+  }
+  
+   ::-webkit-scrollbar-thumb:hover {
+    background: #626970;
+  }
+  
+  ::-webkit-backdrop-filter {
+    blur: 3px saturate(106%);
+  }
+  
+  
