@@ -1,29 +1,62 @@
-"use client"
+'use client'; // Necessary for Next.js Client-side interaction
+
 import { useState } from 'react';
 import { AiFillCloseCircle } from 'react-icons/ai';  
 
 const BlogPostForm = () => {
   const [bannerImage, setBannerImage] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null); // Store file for upload
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  // Handle Image Upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setBannerImage(imageUrl);
+      setThumbnailFile(file); // Store file
     }
   };
 
+  // Handle Remove Image
   const handleRemoveImage = () => {
     setBannerImage(null);
+    setThumbnailFile(null); // Clear file
   };
 
-  const handleSubmit = (e) => {
+  // Handle Form Submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log({ title, content });
+    
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', content);
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+  
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error:', errorData.message);
+        throw new Error(errorData.message);
+      }
+  
+      const data = await response.json();
+      console.log('Blog submitted successfully:', data);
+  
+    } catch (error) {
+      console.error('Submission error:', error);
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white flex items-center justify-center py-12 px-4">
@@ -94,8 +127,9 @@ const BlogPostForm = () => {
           <button
             onClick={handleSubmit}
             className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 transition-all text-white font-semibold py-3 px-12 rounded-full shadow-2xl hover:shadow-purple-600/50 duration-300 ease-in-out transform hover:scale-105"
+            disabled={loading}
           >
-            Submit Blog
+            {loading ? 'Submitting...' : 'Submit Blog'}
           </button>
         </div>
       </div>
