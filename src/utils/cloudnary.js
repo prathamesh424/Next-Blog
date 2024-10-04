@@ -1,27 +1,26 @@
 import fs from 'fs';
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 
- 
-
+// Configure Cloudinary with environment variables
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const uploadOnCloudinary = async (filePath) => {
+  try {
+  
+    const result = await cloudinary.uploader.upload(filePath);
+ 
+    fs.unlinkSync(filePath);
 
-
-const uploadOnCloudinary = (filePath) => {
-    return new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(filePath, (error, result) => {
-            if (error) {
-                reject(error);
-            }
-            fs.unlinkSync(filePath);
-            resolve(result.secure_url); 
-        });
-    });
+    return result.secure_url;
+  } catch (error) {
+ 
+    console.error('Error uploading to Cloudinary:', error);
+    throw new Error('Failed to upload image to Cloudinary');
+  }
 };
 
-
-export {uploadOnCloudinary};
+export default uploadOnCloudinary;

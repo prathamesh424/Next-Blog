@@ -1,5 +1,5 @@
 import { uploadOnCloudinary } from "@/utils/cloudnary";
-import Post from "../models/post";
+import Post from "../models/blog";
 import connectDB from "../database/db";
 
 export const createPost = async (req, res) => {

@@ -1,25 +1,28 @@
-
 import dotenv from 'dotenv';    
-import mongoose from "mongoose";
- 
+import mongoose from 'mongoose';
 
 dotenv.config();   
-import mongoose from "mongoose" 
+ 
+export let isConnected = false;
 
-let isConnected = false; 
 const connectDB = async () => {
-    mongoose.set('strictQuery', true);
+    if (!process.env.MONGO_URL) {
+        console.log('MONGO_URL is not found in environment variables.');
+        return;
+    }
 
-    if (!process.env.MONGODB_URL) return console.log('MONGODB_URL is not found') ;
-    if (isConnected) return console.log('Already connected to the database') ;
+    if (isConnected) {
+        console.log('Already connected to the database.');
+        return;
+    }
 
     try {
-        await mongoose.connect(process.env.MONGODB_URL);
+        await mongoose.connect(process.env.MONGO_URL);
         isConnected = true;
-        console.log('Connected to the database') ;
+        console.log('Successfully connected to the database.');
     } catch (error) {
-        console.error(error) ;
+        console.error('Database connection failed:', error.message);
     }
-}
+};
 
-export default connectDB ;
+export default connectDB;
