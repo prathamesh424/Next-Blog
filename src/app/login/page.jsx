@@ -1,6 +1,8 @@
 "use client"
 
-import React from 'react'
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react'
 import { useState } from "react";
 
 const Login = () => {
@@ -8,9 +10,20 @@ const Login = () => {
         email: "",
         password: ""
     })
+    const router = useRouter() ;
+
+    useEffect(() => {
+
+    })
 
     const onLogin =  async () => {
-
+        try {
+            const response = await axios.post('/api/users/login', user) ;
+            console.log("User Login Successful", response.data) ;
+            router.push('/home') ;
+        } catch (error) {
+            console.log("User Login Failed", error.message) ;
+        }
     }
 
     return (

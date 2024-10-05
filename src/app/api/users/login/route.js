@@ -1,44 +1,56 @@
-import connectDB from "@/lib/database/db.js";
-import User from "@/lib/models/user";
-import { NextResponse , NextRequest } from "next/server";
+import connectDB from "../../../../lib/database/db";
+import User from "../../../../lib/models/user";
+import { NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
+import jwt from 'jsonwebtoken' ;
 
-connectDB() ;
 
+await connectDB();
 
-export async function POST(req  , res) {
-    try { 
-
-        const reqBody = await req.json();
-        const { name, email, password } = reqBody;
-
-        const user = User.findOne({ email: email})
-        if(user ) {
-            return res.json({
-                error: "User Already Exists",
-            } , {status : 400}) ; 
+export async function POST(request) {
+    try {
+        const reqBody = await request.json();
+        const { email, password } = reqBody;  
+   
+        const userExist = await User.findOne({ email });
+        if (!userExist) {
+            return NextResponse.json({
+                error: "User not Exists",
+            }, { status: 400 });
         }
 
+        const passwordCheck = await bcryptjs.compare(password, userExist.password);
 
-        const salt = await bcryptjs.getSalt(10) ;
-        const hashedPassword = await bcryptjs.hash(password, salt) ;
+        if (!passwordCheck) {
+            return NextResponse.json({
+                error: "Invalid Password",
+            }, { status: 400 });
+        }
 
-        const newUser = new User({
-            name, 
-            email, 
-            password : hashedPassword
+        const tokenRawData = {
+            id: userExist._id,
+            email: userExist.email,
+            username : userExist.username,
+            
+        }
+
+        const token = await jwt.sign(tokenRawData, process.env.JWT_SECRET, { expiresIn: '1d' }); 
+        
+        const response =  NextResponse.json({
+            message: "User Created Successfully",
+            success: true
+        });
+
+        response.cookies.set("token" , token , {
+            httpOnly : true,
         })
 
-        const save = await newUser.save()
-
-        return res.json({
-            message: "User Created Successfully",
-        } ,{success: true}, {status : 201}) ;
-        
-    } catch (error) {
-        return res.json({
-            error: error.message
-        } , {status : 500}) ;
+        return response;
+    } 
+    catch (error) {
+        console.error("Error in signup:", error);
+        return NextResponse.json({
+            error: "Internal Server Error: " + error.message
+        }, { status: 500 });
     }
-
 }
