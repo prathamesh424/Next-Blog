@@ -5,6 +5,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 
 const Navbar = () => {
@@ -33,6 +34,19 @@ const Navbar = () => {
     };
   }, []);
 
+
+  const logout = async() => {
+      try {
+
+        const response = await axios.get('/api/users/logout') ;
+        console.log("User Logout Successful", response.data) ;
+        router.push('signup')
+        
+      } catch (error) {
+          console.log(error.message);
+      }
+  }
+
   return (
     <>
      
@@ -48,7 +62,7 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center   justify-between ml-[50%]  mr-[50%]">
         
         {/* <div className="w-1/5">
-          <Image src={logo} alt="clubLogo" className="w-full h-auto" />
+          <Image src={logo} alt="logo" className="w-full h-auto" />
         </div> */}
   
    
@@ -78,7 +92,7 @@ const Navbar = () => {
             Contact
             </Link>
           </li>
-            <button onClick={() => router.push('/auth') } className='bg-black font-bold text-md px-4 py-2 rounded-xl  hover:bg-white hover:text-black border-2 '> 
+            <button onClick={logout}className='bg-black font-bold text-md px-4 py-2 rounded-xl  hover:bg-white hover:text-black border-2 '> 
               Logout
             </button>
         </ul>
@@ -114,12 +128,11 @@ const Navbar = () => {
             Contact
             </Link>
           </li>
-          <button onClick={() => router.push('/auth') } className='bg-black font-bold text-md px-4 py-2 rounded-xl  hover:bg-white hover:text-black border-2 '> 
+          <button onClick={logout} className='bg-black font-bold text-md px-4 py-2 rounded-xl  hover:bg-white hover:text-black border-2 '> 
            Logout
         </button>
           </ul>
         )}
-        
       </div>
     </nav>
     </>

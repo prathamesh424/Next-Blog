@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-
-import React from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const userBlogs = [
   {
@@ -28,6 +28,32 @@ const userBlogs = [
 ];
 
 const Profile = () => {
+  const [user, setUser] = useState(null);  
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get('/api/users/data');
+        setUser(res.data);   
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);   
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex justify-center items-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white p-6">
       {/* Profile Header */}
@@ -40,7 +66,7 @@ const Profile = () => {
               className="w-32 h-32 object-cover rounded-full"
             />
             <div>
-              <h1 className="text-3xl font-bold">John Doe</h1>
+              <h1 className="text-3xl font-bold">{user ? `${user.user.username}`: "User001"}</h1>
               <p className="text-gray-400">Web Developer, Blogger</p>
             </div>
           </div>
