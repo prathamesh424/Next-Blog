@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
 import { useState } from "react";
+import Link from 'next/link';
 
 const Login = () => {
     const [user , setUser] = useState({
@@ -37,7 +38,10 @@ const Login = () => {
 
                 <input id="password" type="password" placeholder="Create strong password" className="p-2 border-2 rounded-xl mt-2" value={user.password} onChange={(e) => setUser({...user, password: e.target.value})} />
                 <button onClick={onLogin} className="p-2 w-20 mx-auto hover:text-black text-white rounded-xl bg-orange-500 mt-4 hover:bg-orange-700">Login</button>
-                
+
+                <Link href='/reset_password'>
+                    <p className=" mt-5 underline text-orange-600 hover:text-white ">Forgot Password?</p>
+                </Link>  
             </div>
             
         </div>
