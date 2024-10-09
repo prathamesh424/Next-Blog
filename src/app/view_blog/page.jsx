@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiSettings } from 'react-icons/fi';
 import './view.css';
+import axios from 'axios';
 
 const categories = [
   'Technology',
@@ -16,49 +17,27 @@ const categories = [
   'Sports',
 ];
 
-const posts = [
-  {
-    id: 1,
-    title: 'Understanding React Hooks',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 24, 2024',
-    author: 'John Doe',
-  },
-  {
-    id: 2,
-    title: 'Tips for Healthy Living',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 20, 2024',
-    author: 'Jane Smith',
-  },
-  {
-    id: 3,
-    title: 'Exploring the World of AI',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 18, 2024',
-    author: 'Alice Johnson',
-  },
-  {
-    id: 4,
-    title: 'The Best Travel Destinations for 2025',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 15, 2024',
-    author: 'Mark Lee',
-  },
-  {
-    id: 5,
-    title: 'Healthy Recipes for Busy People',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 10, 2024',
-    author: 'Emma Brown',
-  },
-];
-
 const Explore = () => {
   const [showSettings, setShowSettings] = useState(false);
+  const [posts, setPosts] = useState([]); // State to store the posts
   const settingsRef = useRef(null);
 
-  // Close the dropdown when clicking outside of it or when selecting an option
+  // Function to fetch posts from the API
+  const getPosts = async () => { 
+    try {
+      const response = await axios.get('/api/posts/all_posts');
+      setPosts(response.data); // Set the fetched posts to the state
+      posts.reverse();
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  }
+
+ 
+  useEffect(() => {
+    getPosts();
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (settingsRef.current && !settingsRef.current.contains(event.target)) {
@@ -78,7 +57,6 @@ const Explore = () => {
   return (
     <div>
       <div className="flex flex-col md:flex-row bg-black text-white min-h-screen">
-        {/* Sidebar (Categories for Desktop) */}
         <aside className="hidden md:flex flex-col justify-between w-1/4 p-4 bg-gray-800 relative">
           <div>
             <h2 className="text-xl font-bold mb-4">Categories</h2>
@@ -96,10 +74,9 @@ const Explore = () => {
             </ul>
           </div>
 
-          {/* Settings Icon at Bottom Left */}
           <div className="absolute bottom-4 left-4">
             <FiSettings
-              className="text-2xl cursor-pointer hover:text-purple-500 transition duration-300"
+              className="text-2xl cursor-pointer hover:text-orange-500 transition duration-300"
               onClick={toggleSettings}
             />
             {showSettings && (
@@ -138,17 +115,13 @@ const Explore = () => {
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="w-full md:w-3/4 p-4">
           <h1 className="text-3xl font-bold mb-6">Explore</h1>
-
-          {/* Categories (Top for Mobile) */}
           <div className="block md:hidden w-full p-4 mb-4 rounded-lg bg-black">
             <div className="flex justify-between">
               <h2 className="text-xl font-bold mb-4">Categories</h2>
-              {/* Settings Icon on Mobile (Opposite Hamburger) */}
               <FiSettings
-                className="text-2xl cursor-pointer hover:text-purple-500 transition duration-300"
+                className="text-2xl cursor-pointer hover:text-orange-500 transition duration-300"
                 onClick={toggleSettings}
               />
               {showSettings && (
@@ -204,16 +177,16 @@ const Explore = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
               <div
-                key={post.id}
+                key={post._id}
                 className="bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300"
               >
                 <img
-                  src={post.image}
+                  src="https://imgs.search.brave.com/LENf4yOxIDrIhiVRJOylPFeT-2EoN5VbHhCAn1OALX0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMuY3RmYXNzZXRz/Lm5ldC9ocmx0eDEy/cGw4aHEvN2phRkdR/dWFOaXJDQmdpbXVF/d0JWVC9jNDAzYWZj/ZDczZGI0MjI5ZGMx/YTc3MWEzMGUxZjI3/OC9Xb25kZXJzLW9m/LU5hdHVyZS1UaHVt/Yi5qcGc"
                   alt={post.title}
                   className="w-full h-48 object-cover rounded mb-4"
                 />
                 <h3 className="text-lg font-semibold mb-1">{post.title}</h3>
-                <p className="text-gray-400">{post.date}</p>
+                <p className="text-gray-400">{post.createdAt}</p>
                 <p className="text-gray-500">By {post.author}</p>
               </div>
             ))}

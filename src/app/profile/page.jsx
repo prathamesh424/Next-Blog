@@ -3,46 +3,34 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
-const userBlogs = [
-  {
-    id: 1,
-    title: 'Understanding React Hooks',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 24, 2024',
-    content: 'This blog post explores React Hooks and their importance...',
-  },
-  {
-    id: 2,
-    title: 'Tips for Healthy Living',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 20, 2024',
-    content: 'In this blog post, we share tips for maintaining a healthy lifestyle...',
-  },
-  {
-    id: 3,
-    title: 'Exploring the World of AI',
-    image: 'https://via.placeholder.com/300',
-    date: 'September 18, 2024',
-    content: 'An introductory guide to artificial intelligence...',
-  },
-];
 
 const Profile = () => {
   const [user, setUser] = useState(null);  
   const [loading, setLoading] = useState(true);
+  const [userBlogs , setUserBlogs] = useState([]);
+
+
+  const getBlogs = async () => {
+    try {
+      const response =  await axios.get('/api/posts/create_blog') ;
+      setUserBlogs(response.data);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    }
+  }
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const res = await axios.get('/api/users/data');
         setUser(res.data);   
+        getBlogs();  
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
         setLoading(false);   
       }
     };
-
     fetchUserData();
   }, []);
   
@@ -91,11 +79,11 @@ const Profile = () => {
           <h2 className="text-2xl font-bold mb-4">My Blogs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {userBlogs.map((blog) => (
-              <div key={blog.id} className="bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover rounded mb-4" />
+              <div key={blog._id} className="bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                <img src={blog.picture} alt={blog.title} className="w-full h-48 object-cover rounded mb-4" />
                 <h3 className="text-lg font-semibold mb-1">{blog.title}</h3>
-                <p className="text-gray-400">{blog.date}</p>
-                <p className="text-gray-500">{blog.content.slice(0, 100)}...</p>
+                <p className="text-gray-400">{blog.createdAt}</p>
+                <p className="text-gray-500">{blog.description.slice(0, 100)}...</p>
                 <button className="mt-2 text-purple-500 hover:underline">Read More</button>
               </div>
             ))}

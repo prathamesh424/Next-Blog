@@ -8,7 +8,6 @@ export async function GET(){
             {"Message" : "Logged Out Successfully"} ,
             {status :200}
         );
-
         response.cookies.set("token" , "" ,  {
             httpOnly : true,
             expires : new Date(0) 

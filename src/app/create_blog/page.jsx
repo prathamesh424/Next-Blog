@@ -41,35 +41,55 @@ const BlogPostForm = () => {
       return;
     }
   
-    const formData = new FormData();
-    formData.append('title', blog.title);
-    formData.append('description', blog.description);
-    if (thumbnailFile) {
-      formData.append('picture', thumbnailFile);
-    }
-
-    console.log(formData)
-  
     try {
-      const response = await axios.post('/api/posts/create_blog', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Ensure that the request is properly recognized as multipart/form-data
-        },
-      });
+      // 1. Upload the image first if the image exists
+      let imageUrl = null;
+      console.log('Thumbnail File:', thumbnailFile);
   
-      if (response.data.success) {
-        console.log('Post created successfully:', response.data);
-        router.push("/view_blog");
-      } else {
-        console.error('Error:', response.data.error);
+      if (thumbnailFile) {
+        // Create a FormData object and append the file
+        const imageData = new FormData();
+        imageData.append('picture', thumbnailFile);
+  
+        // Log the FormData content to verify
+        for (let [key, value] of imageData.entries()) {
+          console.log(`FormData key: ${key}, value: ${value.name || value}`);
+        }
+  
+        const imageResponse = await axios.post('/api/posts/upload_image', imageData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        // Extract the image URL from the response
+        imageUrl = imageResponse?.data?.imageUrl;
+        console.log('Uploaded Image URL:', imageUrl);
       }
   
+      // 2. Send the blog data separately with the image URL
+      const blogData = {
+        ...blog,
+        picture: imageUrl,
+      };
+  
+      const response = await axios.post('/api/posts/create_blog', blogData);
+  
+      if (response) {
+        console.log('Post created successfully:', response);
+        // router.push("/view_blog");
+      } else {
+        console.error('Error:', response.error);
+      }
     } catch (error) {
       console.error('Error creating post:', error);
     } finally {
       setLoading(false);
     }
   };
+  
+
+  
   
 
   return (

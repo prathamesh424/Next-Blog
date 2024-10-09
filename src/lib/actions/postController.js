@@ -60,7 +60,6 @@ export const deletePost = async (request, response) => {
 export const getPost = async (request, response) => {
     try {
         const post = await Post.findById(request.params.id);
-
         response.status(200).json(post);
     } catch (error) {
         response.status(500).json(error)

@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose , {Schema} from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+
 
 const BlogSchema = new mongoose.Schema({
   title: {
@@ -13,6 +15,7 @@ const BlogSchema = new mongoose.Schema({
   picture: {
     type: String, 
     required: false,
+    default: "" 
   },
   categories: {
     type: [String],  
@@ -22,8 +25,14 @@ const BlogSchema = new mongoose.Schema({
     type: Date,
     default: Date.now 
   },
+  author:{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required : true  
+  },
 });
 
-const Blog = mongoose.models.blogs ||  mongoose.model('Blog', BlogSchema);
+BlogSchema.plugin(mongooseAggregatePaginate)
+const Blog = mongoose.models.Blog ||  mongoose.model('Blog', BlogSchema);
 
 export default Blog;
